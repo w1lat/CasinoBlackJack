@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class SetServiceImpl {
 
-    private static List<Card> defaultSet = new ArrayList<Card>();
+    private static final List<Card> defaultSet = new ArrayList<Card>();
 
 
 
@@ -30,7 +30,6 @@ public class SetServiceImpl {
             unShuffledSet.remove(randCard);
             i++;
         }
-        System.out.println(shuffledSet);
         return shuffledSet;
     }
 

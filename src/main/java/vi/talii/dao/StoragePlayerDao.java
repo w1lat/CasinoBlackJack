@@ -4,9 +4,7 @@ import vi.talii.exception.NoSuchPlayerException;
 import vi.talii.model.Player;
 import vi.talii.storage.PlayerStorage;
 
-/**
- * Created by Vitalii on 06.10.2015.
- */
+
 public class StoragePlayerDao implements PlayerDao {
 
     private PlayerStorage playerStorage;
@@ -27,7 +25,7 @@ public class StoragePlayerDao implements PlayerDao {
         }else return found;
     }
 
-    public void updatePlayersCash(int id, int cash) {
+    public void updatePlayersCash(int id, float cash) {
         playerStorage.updateCash(id, cash);
     }
 }

@@ -4,15 +4,11 @@ package vi.talii.model;
 public class Player {
 
     private int account_id;
-    private int cash;
-    private int bet;
-    private int win;
+    private float cash;
 
-    public Player(int account_id, int cash, int bet, int win) {
+    public Player(int account_id, float cash) {
         this.account_id = account_id;
         this.cash = cash;
-        this.bet = bet;
-        this.win = win;
     }
 
     public Player() {
@@ -26,29 +22,14 @@ public class Player {
         this.account_id = account_id;
     }
 
-    public int getCash() {
+    public float getCash() {
         return cash;
     }
 
-    public void setCash(int cash) {
+    public void setCash(float cash) {
         this.cash = cash;
     }
 
-    public int getBet() {
-        return bet;
-    }
-
-    public void setBet(int bet) {
-        this.bet = bet;
-    }
-
-    public int getWin() {
-        return win;
-    }
-
-    public void setWin(int win) {
-        this.win = win;
-    }
 
 
 }

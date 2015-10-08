@@ -1,12 +1,11 @@
-package vi.talii.dao;
+package vi.talii.service;
 
 import vi.talii.exception.NoSuchPlayerException;
 import vi.talii.model.Player;
 
 
-public interface PlayerDao {
+public interface PlayerService {
 
-    Player addNewPlayer(Player player);
     Player getPlayerById(int id) throws NoSuchPlayerException;
     void updatePlayersCash(int id, float cash);
 }

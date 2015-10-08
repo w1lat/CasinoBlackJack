@@ -28,7 +28,7 @@ public class PlayerStorage {
         return playerStorage.get(id);
     }
 
-    public void updateCash(int id, int cash){
+    public void updateCash(int id, float cash){
         Player temp = playerStorage.get(id);
         temp.setCash(cash);
         playerStorage.put(id, temp);
