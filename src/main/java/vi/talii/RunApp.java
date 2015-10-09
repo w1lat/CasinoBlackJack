@@ -1,5 +1,7 @@
 package vi.talii;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import vi.talii.view.ConsoleView;
 
 /**
@@ -8,7 +10,8 @@ import vi.talii.view.ConsoleView;
 public class RunApp {
 
     public static void main(String[] args) {
-        ConsoleView view = new ConsoleView();
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:app-context.xml");
+        ConsoleView view = applicationContext.getBean(ConsoleView.class);
         view.start();
     }
 }

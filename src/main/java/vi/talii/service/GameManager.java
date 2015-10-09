@@ -1,5 +1,7 @@
 package vi.talii.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import vi.talii.exception.NoSuchPlayerException;
 import vi.talii.model.Card;
 import vi.talii.model.Player;
@@ -8,20 +10,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-
+@Controller
 public class GameManager {
 
+    public static final int POINT_LIMIT = 21;
     private Scanner scanner = new Scanner(System.in);
 
-    private PlayerService playerService = new PlayerServiceImpl();
+    @Autowired
+    private PlayerService playerService;
 
     private Player player;
     private Card card;
     private int playerCount = 0;
     private int dealerCount = 0;
     private List<Card> currentDeck = new ArrayList<Card>();
+    private int currBet;
 
     public GameManager() {
+    }
+
+    public GameManager(PlayerService playerService) {
+        this.playerService = playerService;
     }
 
     public void setPlayer(Player player) {
@@ -36,7 +45,7 @@ public class GameManager {
     public void play() {
         while (this.player.getCash() > 0) {
             System.out.println("Make your bet");
-            int currBet = scanner.nextInt();
+            currBet = scanner.nextInt();
             if (currBet <= player.getCash()) {
                 player.setCash(player.getCash() - currBet);
                 currentDeck = SetServiceImpl.shuffle();
@@ -54,48 +63,20 @@ public class GameManager {
                 Card dealerLastCard = card;
                 System.out.println("dealer has " + (dealerCount - dealerLastCard.getCount()) + "points");//показать очки диллера без второй карты
 
-                if (playerCount == 21 || dealerCount == 21) {
-                    if (playerCount == 21 && dealerCount == 21) {
-                        System.out.println("push");
-                        player.setCash(player.getCash() + currBet);
-                        playerService.updatePlayersCash(player.getAccount_id(), player.getCash());
-                        System.out.println("your cash is " + player.getCash());
-                    } else if (playerCount == 21) {
-                        System.out.println("You got BlackJack!!!");
-                        player.setCash(player.getCash() + currBet * 2.5F);
-                        playerService.updatePlayersCash(player.getAccount_id(), player.getCash());
-                        System.out.println("your cash is " + player.getCash());
-                    } else if (dealerCount == 21) {
-                        System.out.println("dealer has BlackJack!!!");
-                        System.out.println("your cash is " + player.getCash());
-                        playerService.updatePlayersCash(player.getAccount_id(), player.getCash());
-                    }
+                if (checkForBlackJackExist()) {
+                    BlackJackProcess(); //обаработка данных если у кого то есть BlackJack
                 } else {
                     playersGame();
-                    if (playerCount <= 21) {
+                    if (checkForUserNotBusted()) {
                         System.out.println("dealer got " + dealerLastCard.getIndex() + " " + card.getSuit());
                         System.out.println("dealer has " + dealerCount + "points");
                         dealersGame();
-                        if (dealerCount <= 21) {
-                            if (dealerCount == playerCount) {
-                                System.out.println("push");
-                                player.setCash(player.getCash() + currBet);
-                                playerService.updatePlayersCash(player.getAccount_id(), player.getCash());
-                                System.out.println("your cash is " + player.getCash());
-                            } else if (dealerCount < playerCount) {
-                                System.out.println("you won");
-                                player.setCash(player.getCash() + currBet * 2);
-                                playerService.updatePlayersCash(player.getAccount_id(), player.getCash());
-                                System.out.println("your cash is " + player.getCash());
-                            } else {
-                                System.out.println("dealer won");
-                                System.out.println("your cash is " + player.getCash());
-                                playerService.updatePlayersCash(player.getAccount_id(), player.getCash());
-                            }
+                        if (checkForDealerNotBusted()) {
+                            processGameResult(); //обработка данных по окончанию игры (сравнивание очков, определение победителя)
                         } else {
                             System.out.println("you won");
                             player.setCash(player.getCash() + currBet * 2);
-                            playerService.updatePlayersCash(player.getAccount_id(), player.getCash());
+                            playerService.updatePlayersCash(player.getId(), player.getCash());
                             System.out.println("your cash is " + player.getCash());
                         }
                     } else {
@@ -104,7 +85,7 @@ public class GameManager {
                         System.out.println("dealer has " + dealerCount + "points");
                         System.out.println("dealer won");
                         System.out.println("your cash is " + player.getCash());
-                        playerService.updatePlayersCash(player.getAccount_id(), player.getCash());
+                        playerService.updatePlayersCash(player.getId(), player.getCash());
                     }
                 }
             } else {
@@ -112,6 +93,74 @@ public class GameManager {
             }
         }
         System.out.println("Sorry but your cash is 0");
+    }
+
+    private void processGameResult() {
+        if (checkForPush()) {
+            System.out.println("push");
+            player.setCash(player.getCash() + currBet);
+            playerService.updatePlayersCash(player.getId(), player.getCash());
+            System.out.println("your cash is " + player.getCash());
+        } else if (checkForUserWin()) {
+            System.out.println("you won");
+            player.setCash(player.getCash() + currBet * 2);
+            playerService.updatePlayersCash(player.getId(), player.getCash());
+            System.out.println("your cash is " + player.getCash());
+        } else {
+            System.out.println("dealer won");
+            System.out.println("your cash is " + player.getCash());
+            playerService.updatePlayersCash(player.getId(), player.getCash());
+        }
+    }
+
+    private void BlackJackProcess() {
+        if (checkForBlackJackPush()) {
+            System.out.println("push");
+            player.setCash(player.getCash() + currBet);
+            playerService.updatePlayersCash(player.getId(), player.getCash());
+            System.out.println("your cash is " + player.getCash());
+        } else if (checkForUsersBlackJack()) {
+            System.out.println("You got BlackJack!!!");
+            player.setCash(player.getCash() + currBet * 2.5);
+            playerService.updatePlayersCash(player.getId(), player.getCash());
+            System.out.println("your cash is " + player.getCash());
+        } else if (checkForDealersBlackJack()) {
+            System.out.println("dealer has BlackJack!!!");
+            System.out.println("your cash is " + player.getCash());
+            playerService.updatePlayersCash(player.getId(), player.getCash());
+        }
+    }
+
+    private boolean checkForUserWin() {
+        return dealerCount < playerCount;
+    }
+
+    private boolean checkForPush() {
+        return dealerCount == playerCount;
+    }
+
+    private boolean checkForDealerNotBusted() {
+        return dealerCount <= POINT_LIMIT;
+    }
+
+    private boolean checkForUserNotBusted() {
+        return playerCount <= POINT_LIMIT;
+    }
+
+    private boolean checkForDealersBlackJack() {
+        return dealerCount == POINT_LIMIT;
+    }
+
+    private boolean checkForUsersBlackJack() {
+        return playerCount == POINT_LIMIT;
+    }
+
+    private boolean checkForBlackJackPush() {
+        return checkForUsersBlackJack() && checkForDealersBlackJack();
+    }
+
+    private boolean checkForBlackJackExist() {
+        return checkForUsersBlackJack() || checkForDealersBlackJack();
     }
 
     private void doStopHitChoise(int choice) {
@@ -130,7 +179,7 @@ public class GameManager {
 
     private void playersGame() {
         int choice = 1;
-        while (playerCount < 21 && choice != 2) {
+        while (playerCount < POINT_LIMIT && choice != 2) {
             System.out.println("press 1 to hit, press 2 to stop");
             choice = scanner.nextInt();
             doStopHitChoise(choice);

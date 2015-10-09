@@ -1,19 +1,22 @@
 package vi.talii.view;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import vi.talii.exception.NoSuchPlayerException;
 import vi.talii.model.Player;
 import vi.talii.service.GameManager;
 import vi.talii.service.PlayerService;
-import vi.talii.service.PlayerServiceImpl;
 import java.util.Scanner;
 
-
+@Controller
 public class ConsoleView implements View {
 
     private Scanner scanner = new Scanner(System.in);
-    private PlayerService playerService = new PlayerServiceImpl();
+    @Autowired
+    private PlayerService playerService;
     private Player player;
-    private GameManager manager = new GameManager();
+    @Autowired
+    private GameManager manager;
 
     public void start() {
         while (true) {
@@ -60,7 +63,7 @@ public class ConsoleView implements View {
     private void fillUpCash() {
         System.out.println("Enter please money to upfill your cash");
         player.setCash(player.getCash() + scanner.nextInt());
-        playerService.updatePlayersCash(player.getAccount_id(), player.getCash());
+        playerService.updatePlayersCash(player.getId(), player.getCash());
     }
 
 }

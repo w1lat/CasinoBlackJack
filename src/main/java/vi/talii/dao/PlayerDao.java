@@ -8,5 +8,5 @@ public interface PlayerDao {
 
     Player addNewPlayer(Player player);
     Player getPlayerById(int id) throws NoSuchPlayerException;
-    void updatePlayersCash(int id, float cash);
+    void updatePlayersCash(int id, double cash);
 }
