@@ -6,6 +6,8 @@ import vi.talii.exception.NoSuchPlayerException;
 import vi.talii.model.Player;
 import vi.talii.service.GameManager;
 import vi.talii.service.PlayerService;
+
+import java.util.Collections;
 import java.util.Scanner;
 
 @Controller
@@ -24,24 +26,24 @@ public class ConsoleView implements View {
             int playerId;
             try {
                 playerId = scanner.nextInt();
-
-                    player = manager.confirmPlayer(playerId);
-                    while (true) {
-                        manager.setPlayer(player);
-                        showMainMenu();
-                        int choice = scanner.nextInt();
-                        doGeneralActionChoise(choice);
-                    }
-                } catch (NoSuchPlayerException e) {
-                    e.printStackTrace();
-
+                System.out.println(playerService.getAll());
+                player = manager.confirmPlayer(playerId);
+                manager.setPlayer(player);
+                System.out.println("Hi. Your cash is " + player.getCash() + "usd");
+                while (true) {
+                    showMainMenu();
+                    int choice = scanner.nextInt();
+                    doGeneralActionChoise(choice);
                 }
+            } catch (NoSuchPlayerException e) {
+                e.printStackTrace();
+
+            }
         }
 
     }
 
-    private void showMainMenu(){
-        System.out.println("Hi. Your cash is " + player.getCash() + "usd");
+    private void showMainMenu() {
         System.out.println("1. Play");
         System.out.println("2. Fill up your cash");
     }
@@ -64,6 +66,7 @@ public class ConsoleView implements View {
         System.out.println("Enter please money to upfill your cash");
         player.setCash(player.getCash() + scanner.nextInt());
         playerService.updatePlayersCash(player.getId(), player.getCash());
+        System.out.println("Now your cash is " + player.getCash());
     }
 
 }

@@ -7,7 +7,7 @@ import vi.talii.model.Player;
 import vi.talii.storage.PlayerStorage;
 
 @Repository
-public class StoragePlayerDao implements PlayerDao {
+public class StoragePlayerDao{
 
     @Autowired
     private PlayerStorage playerStorage;

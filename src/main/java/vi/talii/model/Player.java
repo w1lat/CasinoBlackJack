@@ -27,6 +27,11 @@ public class Player extends GeneratedIdentifierEntity{
         this.cash = cash;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "Player{" +
+                "id=" + getId() + " " +
+                "cash=" + cash +
+                '}';
+    }
 }
