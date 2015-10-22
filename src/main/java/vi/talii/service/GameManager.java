@@ -1,202 +1,173 @@
 package vi.talii.service;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import vi.talii.exception.GameContextNotFoundException;
+import vi.talii.exception.GameCouldNotBeStartedException;
+import vi.talii.exception.GameException;
 import vi.talii.exception.NoSuchPlayerException;
-import vi.talii.model.Card;
-import vi.talii.model.Player;
+import vi.talii.model.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Map;
 
 @Controller
 public class GameManager {
 
-    public static final int POINT_LIMIT = 21;
-    private Scanner scanner = new Scanner(System.in);
+    private static final Logger LOGGER = Logger.getLogger(GameManager.class);
 
-    @Autowired
     private PlayerService playerService;
 
-    private Player player;
-    private Card card;
-    private int playerCount = 0;
-    private int dealerCount = 0;
-    private List<Card> currentDeck = new ArrayList<Card>();
-    private int currBet;
+    private DeckService deckService;
 
-    public GameManager() {
-    }
+    private Map<String, GameContext> activeGames = new HashMap<String, GameContext>();
 
-    public GameManager(PlayerService playerService) {
+    private String currentGameId;
+
+    @Autowired
+    public GameManager(PlayerService playerService, DeckService deckService) {
         this.playerService = playerService;
+        this.deckService = deckService;
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    public GameResponce deal(long account, int bet) throws GameException{
+        LOGGER.info("Starting new blackjack game for account " + account +  " with bet " + bet);
+        if (playerService.canPlay(account, bet)) {
+            GameContext gameContext = createNewGame(account, bet);
+            return buildGameResponce(gameContext);
+        } else {
+            throw new GameCouldNotBeStartedException("Game could not be started, because player with id: " + account
+                    + ", is not allowed to play");
+        }
     }
 
-    public Player confirmPlayer(int playerId) throws NoSuchPlayerException {
-        Player player = playerService.getPlayerById(playerId);
-        return player;
+    public GameResponce stand(String gameId) throws GameException {
+        if (activeGames.containsKey(gameId)) {
+            GameContext gameContext = activeGames.get(gameId);
+            LOGGER.info("Found deal. Executing STAND command");
+            dealerTurn(gameContext);
+            GameResponce gameResponce = buildGameResponce(gameContext);
+            gameResponce.setGameResult(gameContext.getGameResult());
+            return gameResponce;
+        } else {
+            throw new GameContextNotFoundException();
+        }
     }
 
-    public void play() {
-        while (this.player.getCash() > 0) {
-            System.out.println("Make your bet");
-            currBet = scanner.nextInt();
-            if (currBet <= player.getCash()) {
-                player.setCash(player.getCash() - currBet);
-                currentDeck = SetServiceImpl.shuffle();
-//                    Обнуляем счета предыдущих игр
-                playerCount = 0;
-                dealerCount = 0;
-//                    Сдаем карты
+    public GameResponce hit(String gameId) throws GameException {
+        if (activeGames.containsKey(gameId)) {
+            GameContext gameContext = activeGames.get(gameId);
+            LOGGER.info("Found deal. Executing HIT command");
+            gameContext.getPlayerCards().add(deckService.dealNextCard(gameContext.getDeck()));
+            if (gameContext.isPlayerBusted()) {
+                gameContext.getDealerCards().add(deckService.dealNextCard(gameContext.getDeck()));
+                return playerLost(gameContext);
+            } else if (gameContext.getPlayerPoints() == 21) {
+                return dealerTurn(gameContext);
+            }
+            return buildGameResponce(gameContext);
+        } else {
+            throw new GameContextNotFoundException();
+        }
+    }
 
 
-                playerCount += giveCard("you", true);//дать карту игроку, показать ее номинал
-                dealerCount += giveCard("dealer", true);//дать карту диллеру и показать ее номинал
-                playerCount += giveCard("you", true);//дать карту игроку, показать ее номинал
-                System.out.println("you have " + playerCount + "points");//показать количество очков у игрока
-                dealerCount += giveCard("dealer", false);//дать карту диллеру, не показывать ее номинал
-                Card dealerLastCard = card;
-                System.out.println("dealer has " + (dealerCount - dealerLastCard.getCount()) + "points");//показать очки диллера без второй карты
+    private GameResponce dealerTurn(GameContext gameContext) throws NoSuchPlayerException {
+        LOGGER.info("Simulate dealer's behavior...");
+        while (gameContext.getDealerPoints() < 17) {
+            gameContext.getDealerCards().add(deckService.dealNextCard(gameContext.getDeck()));
+        }
+        if (gameContext.getGameResult() == GameResult.WIN) {
+            activeGames.remove(gameContext.getId());
+            return playerWins(gameContext);
+        } else if (gameContext.getGameResult() == GameResult.LOOSE) {
+            activeGames.remove(gameContext.getId());
+            return playerLost(gameContext);
+        } else {
+            activeGames.remove(gameContext.getId());
+            return push(gameContext);
+        }
+    }
 
-                if (checkForBlackJackExist()) {
-                    BlackJackProcess(); //обаработка данных если у кого то есть BlackJack
-                } else {
-                    playersGame();
-                    if (checkForUserNotBusted()) {
-                        System.out.println("dealer got " + dealerLastCard.getIndex() + " " + card.getSuit());
-                        System.out.println("dealer has " + dealerCount + "points");
-                        dealersGame();
-                        if (checkForDealerNotBusted()) {
-                            processGameResult(); //обработка данных по окончанию игры (сравнивание очков, определение победителя)
-                        } else {
-                            System.out.println("you won");
-                            player.setCash(player.getCash() + currBet * 2);
-                            playerService.updatePlayersCash(player.getId(), player.getCash());
-                            System.out.println("your cash is " + player.getCash());
-                        }
-                    } else {
-                        System.out.println("you bust");
-                        System.out.println("dealer got " + dealerLastCard.getIndex() + " " + card.getSuit());
-                        System.out.println("dealer has " + dealerCount + "points");
-                        System.out.println("dealer won");
-                        System.out.println("your cash is " + player.getCash());
-                        playerService.updatePlayersCash(player.getId(), player.getCash());
-                    }
-                }
+    private GameResponce playerLost(GameContext gameContext) throws NoSuchPlayerException {
+        GameResponce gameResponce = buildGameResponce(gameContext);
+        gameResponce.setGameResult(gameContext.getGameResult());
+        return gameResponce;
+    }
+
+    private GameResponce playerWins(GameContext gameContext) throws NoSuchPlayerException {
+        int bet = gameContext.getBet();
+        int winBonus = bet * 2;
+        playerService.addFunds(gameContext.getAccount(), winBonus, TransactionType.WIN);
+        GameResponce gameResponce = buildGameResponce(gameContext);
+        gameResponce.setGameResult(gameContext.getGameResult());
+        return gameResponce;
+    }
+
+    private GameResponce buildGameResponce(GameContext gameContext) {
+        LOGGER.info("Building GameResponse...");
+        String id = gameContext.getId();
+        List<Card> playerCards = gameContext.getPlayerCards();
+        List<Card> dealerCards = gameContext.getDealerCards();
+        int playerPoints = gameContext.getPlayerPoints();
+        int dealerPoints = gameContext.getDealerPoints();
+        int bet = gameContext.getBet();
+        return new GameResponce(id, playerCards, dealerCards, playerPoints, dealerPoints, bet);
+    }
+
+    private GameContext createNewGame(long account, int bet) throws NoSuchPlayerException {
+        LOGGER.info("Building new GameContext...");
+        List<Card> deck = deckService.getNewDeck(true);
+        List<Card> playersCards = new ArrayList<Card>();
+        List<Card> dealersCards = new ArrayList<Card>();
+        playersCards.add(deckService.dealNextCard(deck));
+        playersCards.add(deckService.dealNextCard(deck));
+        dealersCards.add(deckService.dealNextCard(deck));
+
+        GameContext gameContext = new GameContext(bet, playersCards, dealersCards, deck, account);
+        activeGames.put(gameContext.getId(), gameContext);
+
+        currentGameId = gameContext.getId();
+
+        if (gameContext.isPlayerBlackjack()) {
+            dealersCards.add(deckService.dealNextCard(deck));
+            if (gameContext.isDealerBlackjack()) {
+                push(gameContext);
             } else {
-                System.out.println("You have not enought cash on your account");
+                evaluatePlayersBlackjack(gameContext);
             }
         }
-        System.out.println("Sorry but your cash is 0");
+        return gameContext;
     }
 
-    private void processGameResult() {
-        if (checkForPush()) {
-            System.out.println("push");
-            player.setCash(player.getCash() + currBet);
-            playerService.updatePlayersCash(player.getId(), player.getCash());
-            System.out.println("your cash is " + player.getCash());
-        } else if (checkForUserWin()) {
-            System.out.println("you won");
-            player.setCash(player.getCash() + currBet * 2);
-            playerService.updatePlayersCash(player.getId(), player.getCash());
-            System.out.println("your cash is " + player.getCash());
-        } else {
-            System.out.println("dealer won");
-            System.out.println("your cash is " + player.getCash());
-            playerService.updatePlayersCash(player.getId(), player.getCash());
-        }
+    private GameResponce push(GameContext gameContext) throws NoSuchPlayerException {
+        playerService.addFunds(gameContext.getAccount(), gameContext.getBet(), TransactionType.PUSH);
+        GameResponce gameResponce = buildGameResponce(gameContext);
+        gameResponce.setGameResult(gameContext.getGameResult());
+        return gameResponce;
     }
 
-    private void BlackJackProcess() {
-        if (checkForBlackJackPush()) {
-            System.out.println("push");
-            player.setCash(player.getCash() + currBet);
-            playerService.updatePlayersCash(player.getId(), player.getCash());
-            System.out.println("your cash is " + player.getCash());
-        } else if (checkForUsersBlackJack()) {
-            System.out.println("You got BlackJack!!!");
-            player.setCash(player.getCash() + currBet * 2.5);
-            playerService.updatePlayersCash(player.getId(), player.getCash());
-            System.out.println("your cash is " + player.getCash());
-        } else if (checkForDealersBlackJack()) {
-            System.out.println("dealer has BlackJack!!!");
-            System.out.println("your cash is " + player.getCash());
-            playerService.updatePlayersCash(player.getId(), player.getCash());
-        }
+    private void evaluatePlayersBlackjack(GameContext gameContext) throws NoSuchPlayerException {
+        int bet = gameContext.getBet();
+        double blackjackBonus = bet * 1.5;
+        int winBonus = (int) (blackjackBonus + bet);
+        playerService.addFunds(gameContext.getAccount(), winBonus, TransactionType.WIN);
+        GameResponce gameResponce = buildGameResponce(gameContext);
+        gameResponce.setGameResult(gameContext.getGameResult());
     }
 
-    private boolean checkForUserWin() {
-        return dealerCount < playerCount;
+    public Map<String, GameContext> getActiveGames() {
+        return activeGames;
     }
 
-    private boolean checkForPush() {
-        return dealerCount == playerCount;
-    }
-
-    private boolean checkForDealerNotBusted() {
-        return dealerCount <= POINT_LIMIT;
-    }
-
-    private boolean checkForUserNotBusted() {
-        return playerCount <= POINT_LIMIT;
-    }
-
-    private boolean checkForDealersBlackJack() {
-        return dealerCount == POINT_LIMIT;
-    }
-
-    private boolean checkForUsersBlackJack() {
-        return playerCount == POINT_LIMIT;
-    }
-
-    private boolean checkForBlackJackPush() {
-        return checkForUsersBlackJack() && checkForDealersBlackJack();
-    }
-
-    private boolean checkForBlackJackExist() {
-        return checkForUsersBlackJack() || checkForDealersBlackJack();
-    }
-
-    private void doStopHitChoise(int choice) {
-        switch (choice) {
-            case 1:
-                playerCount += giveCard("you", true);//дать карту игроку, показать ее номинал
-                System.out.println("you have " + playerCount + "points");
-                break;
-            case 2:
-                break;
-            default:
-                System.out.println("Wrong choice");
-                break;
-        }
-    }
-
-    private void playersGame() {
-        int choice = 1;
-        while (playerCount < POINT_LIMIT && choice != 2) {
-            System.out.println("press 1 to hit, press 2 to stop");
-            choice = scanner.nextInt();
-            doStopHitChoise(choice);
-        }
-    }
-
-    private void dealersGame() {
-        while (dealerCount <= 17) {
-            dealerCount += giveCard("dealer", true);//дать карту диллеру и показать ее номинал
-            System.out.println("dealer has " + dealerCount + "points");
-        }
-    }
-
-    private int giveCard(String person, boolean showing) {
-        card = SetServiceImpl.getTopCard(currentDeck);
-        if (showing)
-            System.out.println(person + " got " + card.getIndex() + " " + card.getSuit());
-        return card.getCount();
+    public String getCurrentGameId() {
+        return currentGameId;
     }
 }
+
+
+
+

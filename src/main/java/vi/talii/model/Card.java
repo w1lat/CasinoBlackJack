@@ -4,13 +4,11 @@ package vi.talii.model;
 public class Card {
 
     private SuitType suit;
-    private String Index;
-    private int Count;
+    private RankType rank;
 
-    public Card(SuitType suit, String index, int count) {
+    public Card(SuitType suit, RankType rank) {
         this.suit = suit;
-        Index = index;
-        Count = count;
+        this.rank = rank;
     }
 
     public Card() {
@@ -24,27 +22,26 @@ public class Card {
         this.suit = suit;
     }
 
-    public String getIndex() {
-        return Index;
+    public RankType getRank() {
+        return rank;
     }
 
-    public void setIndex(String index) {
-        Index = index;
-    }
-
-    public int getCount() {
-        return Count;
-    }
-
-    public void setCount(int count) {
-        Count = count;
+    public void setRank(RankType rank) {
+        this.rank = rank;
     }
 
     @Override
     public String toString() {
         return "Card{" +
-                "Index='" + Index + '\'' +
+                "Rank='" + rank + '\'' +
                 ", suit=" + suit +
                 '}';
+    }
+
+    public int getValue() {
+        if (rank == rank.JACK || rank == rank.QUEEN || rank == rank.KING) {
+            return 10;
+        }
+        return rank.ordinal() + 1;
     }
 }

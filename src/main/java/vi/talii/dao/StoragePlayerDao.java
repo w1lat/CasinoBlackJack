@@ -6,6 +6,8 @@ import vi.talii.exception.NoSuchPlayerException;
 import vi.talii.model.Player;
 import vi.talii.storage.PlayerStorage;
 
+import java.util.List;
+
 @Repository
 public class StoragePlayerDao{
 
@@ -23,7 +25,7 @@ public class StoragePlayerDao{
         return null;
     }
 
-    public Player getPlayerById(int id) throws NoSuchPlayerException{
+    public Player getPlayerById(long id) throws NoSuchPlayerException{
 
         Player found = playerStorage.getPlayerById(id);
         if(found == null){
@@ -31,7 +33,11 @@ public class StoragePlayerDao{
         }else return found;
     }
 
-    public void updatePlayersCash(int id, double cash) {
-        playerStorage.updateCash(id, cash);
+    public List<Player> findAll() {
+        return playerStorage.getAll();
+    }
+
+    public void updatePlayer(Player player) {
+        playerStorage.updatePlayer(player);
     }
 }

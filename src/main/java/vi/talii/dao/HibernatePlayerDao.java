@@ -43,29 +43,27 @@ public class HibernatePlayerDao implements PlayerDao {
         return null;
     }
 
-    public Player getPlayerById(int id) throws NoSuchPlayerException {
+    public Player getPlayerById(long id) throws NoSuchPlayerException {
         EntityManager entityManager = factory.createEntityManager();
         Player find = entityManager.find(Player.class,id);
         if(find == null) throw new NoSuchPlayerException("Sorry but player with this id does not exist");
         return find;
     }
 
-    public void updatePlayersCash(int id, double cash) {
+    public void updatePlayer(Player player) {
         EntityManager entityManager = factory.createEntityManager();
         EntityTransaction transaction = entityManager.getTransaction();
         try{
             transaction.begin();
-            Player player = getPlayerById(id);
-            player.setCash(cash);
             entityManager.merge(player);
             transaction.commit();//implicitly flushes if flush mode is COMMIT or AUTO.
-        } catch (NoSuchPlayerException e) {
+        } catch(Exception e){
             transaction.rollback();
             e.printStackTrace();
         }
     }
 
-    public List<Player> showAll(){
+    public List<Player> findAll(){
         EntityManager entityManager = factory.createEntityManager();
         TypedQuery<Player> query = entityManager.createQuery("SELECT p FROM Player p", Player.class);
         List<Player> all = query.getResultList();
