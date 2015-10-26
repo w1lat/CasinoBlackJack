@@ -19,7 +19,7 @@ public class Transaction implements Serializable {
     @Enumerated(EnumType.ORDINAL)
     private TransactionType paymentType;
 
-    @Column
+    @Column// TODO use long for money, BigDecimal
     private double amount;
 
     public Transaction() {

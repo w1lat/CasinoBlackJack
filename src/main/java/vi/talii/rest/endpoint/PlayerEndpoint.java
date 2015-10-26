@@ -1,7 +1,7 @@
-package vi.talii.rest.controller;
+package vi.talii.rest.endpoint;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import vi.talii.exception.NoSuchPlayerException;
 import vi.talii.model.Player;
 import vi.talii.model.Transaction;
@@ -9,22 +9,22 @@ import vi.talii.model.TransactionType;
 import vi.talii.service.PlayerService;
 
 
+import javax.annotation.PostConstruct;
+import javax.servlet.ServletContext;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 
-@Path("/blackjack/players")
-public class PlayerController {
+@Path("/blackjack/players")//todo remove duplicates in methods path
+public class PlayerEndpoint extends InitServicesBase {
 
-    private static final Logger LOGGER = Logger.getLogger(PlayerController.class);
+    private static final Logger LOGGER = Logger.getLogger(PlayerEndpoint.class);
 
-    private PlayerService playerService;
-
-    @Autowired
-    public PlayerController(PlayerService playerService) {
-        this.playerService = playerService;
+    public PlayerEndpoint() {
     }
+
 
     @GET
     @Produces(MediaType.TEXT_HTML)

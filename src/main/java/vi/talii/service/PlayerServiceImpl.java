@@ -34,7 +34,7 @@ public class PlayerServiceImpl implements PlayerService {
 
     public List<Player> findAll() {
         LOGGER.info("Searching all players...");
-        return (List<Player>) playerDao.findAll();
+        return playerDao.findAll();
     }
 
     public Player find(long account) throws NoSuchPlayerException {

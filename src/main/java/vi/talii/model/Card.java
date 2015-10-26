@@ -42,6 +42,6 @@ public class Card {
         if (rank == rank.JACK || rank == rank.QUEEN || rank == rank.KING) {
             return 10;
         }
-        return rank.ordinal() + 1;
+        return rank.ordinal() + 1;//todo do clear logic or describe solution
     }
 }

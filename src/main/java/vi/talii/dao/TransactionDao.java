@@ -10,7 +10,9 @@ import java.util.List;
 public interface TransactionDao {
 
     List<Transaction> findByPlayerId(long playerId);
+
     void save(Transaction transaction);
+
     List<Transaction> findAll();
 
 }

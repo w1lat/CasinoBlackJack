@@ -13,6 +13,7 @@
         <!--mapping classes-->
 
         <class>vi.talii.model.Player</class>
+        <class>vi.talii.model.Transaction</class>
 
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>

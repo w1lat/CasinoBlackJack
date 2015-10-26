@@ -38,15 +38,18 @@ public class HibernatePlayerDao implements PlayerDao {
         }catch (Exception e){
             LOG.error(e);
             transaction.rollback();
+        } finally {
+            entityManager.close();
         }
-        entityManager.close();
-        return null;
+        return null;//todo throw exception
     }
 
     public Player getPlayerById(long id) throws NoSuchPlayerException {
         EntityManager entityManager = factory.createEntityManager();
         Player find = entityManager.find(Player.class,id);
+
         if(find == null) throw new NoSuchPlayerException("Sorry but player with this id does not exist");
+
         return find;
     }
 
@@ -65,8 +68,9 @@ public class HibernatePlayerDao implements PlayerDao {
 
     public List<Player> findAll(){
         EntityManager entityManager = factory.createEntityManager();
+
         TypedQuery<Player> query = entityManager.createQuery("SELECT p FROM Player p", Player.class);
-        List<Player> all = query.getResultList();
-        return all;
+
+        return query.getResultList();
     }
 }

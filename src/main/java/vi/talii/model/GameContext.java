@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+// todo interface form logic
 public class GameContext {
 
     private static final int BLACKJACK = 21;
