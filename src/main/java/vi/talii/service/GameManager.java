@@ -2,19 +2,20 @@ package vi.talii.service;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import vi.talii.exception.GameContextNotFoundException;
 import vi.talii.exception.GameCouldNotBeStartedException;
 import vi.talii.exception.GameException;
 import vi.talii.exception.NoSuchPlayerException;
 import vi.talii.model.*;
+import vi.talii.model.to.GameResponse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Controller
+@Service//todo make interface and implement
 public class GameManager {
 
     private static final Logger LOGGER = Logger.getLogger(GameManager.class);
@@ -33,7 +34,8 @@ public class GameManager {
         this.deckService = deckService;
     }
 
-    public GameResponce deal(long account, int bet) throws GameException{
+    // todo test failed
+    public GameResponse deal(long account, int bet) throws GameException{
         LOGGER.info("Starting new blackjack game for account " + account +  " with bet " + bet);
         if (playerService.canPlay(account, bet)) {
             GameContext gameContext = createNewGame(account, bet);
@@ -44,20 +46,20 @@ public class GameManager {
         }
     }
 
-    public GameResponce stand(String gameId) throws GameException {
+    public GameResponse stand(String gameId) throws GameException {
         if (activeGames.containsKey(gameId)) {
             GameContext gameContext = activeGames.get(gameId);
             LOGGER.info("Found deal. Executing STAND command");
             dealerTurn(gameContext);
-            GameResponce gameResponce = buildGameResponce(gameContext);
-            gameResponce.setGameResult(gameContext.getGameResult());
-            return gameResponce;
+            GameResponse gameResponse = buildGameResponce(gameContext);
+            gameResponse.setGameResult(gameContext.getGameResult());
+            return gameResponse;
         } else {
             throw new GameContextNotFoundException();
         }
     }
 
-    public GameResponce hit(String gameId) throws GameException {
+    public GameResponse hit(String gameId) throws GameException {
         if (activeGames.containsKey(gameId)) {
             GameContext gameContext = activeGames.get(gameId);
             LOGGER.info("Found deal. Executing HIT command");
@@ -75,7 +77,7 @@ public class GameManager {
     }
 
 
-    private GameResponce dealerTurn(GameContext gameContext) throws NoSuchPlayerException {
+    private GameResponse dealerTurn(GameContext gameContext) throws NoSuchPlayerException {
         LOGGER.info("Simulate dealer's behavior...");
         while (gameContext.getDealerPoints() < 17) {
             gameContext.getDealerCards().add(deckService.dealNextCard(gameContext.getDeck()));
@@ -92,22 +94,22 @@ public class GameManager {
         }
     }
 
-    private GameResponce playerLost(GameContext gameContext) throws NoSuchPlayerException {
-        GameResponce gameResponce = buildGameResponce(gameContext);
-        gameResponce.setGameResult(gameContext.getGameResult());
-        return gameResponce;
+    private GameResponse playerLost(GameContext gameContext) throws NoSuchPlayerException {
+        GameResponse gameResponse = buildGameResponce(gameContext);
+        gameResponse.setGameResult(gameContext.getGameResult());
+        return gameResponse;
     }
 
-    private GameResponce playerWins(GameContext gameContext) throws NoSuchPlayerException {
+    private GameResponse playerWins(GameContext gameContext) throws NoSuchPlayerException {
         int bet = gameContext.getBet();
         int winBonus = bet * 2;
         playerService.addFunds(gameContext.getAccount(), winBonus, TransactionType.WIN);
-        GameResponce gameResponce = buildGameResponce(gameContext);
-        gameResponce.setGameResult(gameContext.getGameResult());
-        return gameResponce;
+        GameResponse gameResponse = buildGameResponce(gameContext);
+        gameResponse.setGameResult(gameContext.getGameResult());
+        return gameResponse;
     }
 
-    private GameResponce buildGameResponce(GameContext gameContext) {
+    private GameResponse buildGameResponce(GameContext gameContext) {
         LOGGER.info("Building GameResponse...");
         String id = gameContext.getId();
         List<Card> playerCards = gameContext.getPlayerCards();
@@ -115,7 +117,7 @@ public class GameManager {
         int playerPoints = gameContext.getPlayerPoints();
         int dealerPoints = gameContext.getDealerPoints();
         int bet = gameContext.getBet();
-        return new GameResponce(id, playerCards, dealerCards, playerPoints, dealerPoints, bet);
+        return new GameResponse(id, playerCards, dealerCards, playerPoints, dealerPoints, bet);
     }
 
     private GameContext createNewGame(long account, int bet) throws NoSuchPlayerException {
@@ -143,11 +145,11 @@ public class GameManager {
         return gameContext;
     }
 
-    private GameResponce push(GameContext gameContext) throws NoSuchPlayerException {
+    private GameResponse push(GameContext gameContext) throws NoSuchPlayerException {
         playerService.addFunds(gameContext.getAccount(), gameContext.getBet(), TransactionType.PUSH);
-        GameResponce gameResponce = buildGameResponce(gameContext);
-        gameResponce.setGameResult(gameContext.getGameResult());
-        return gameResponce;
+        GameResponse gameResponse = buildGameResponce(gameContext);
+        gameResponse.setGameResult(gameContext.getGameResult());
+        return gameResponse;
     }
 
     private void evaluatePlayersBlackjack(GameContext gameContext) throws NoSuchPlayerException {
@@ -155,8 +157,8 @@ public class GameManager {
         double blackjackBonus = bet * 1.5;
         int winBonus = (int) (blackjackBonus + bet);
         playerService.addFunds(gameContext.getAccount(), winBonus, TransactionType.WIN);
-        GameResponce gameResponce = buildGameResponce(gameContext);
-        gameResponce.setGameResult(gameContext.getGameResult());
+        GameResponse gameResponse = buildGameResponce(gameContext);
+        gameResponse.setGameResult(gameContext.getGameResult());
     }
 
     public Map<String, GameContext> getActiveGames() {

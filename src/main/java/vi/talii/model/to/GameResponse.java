@@ -1,10 +1,14 @@
-package vi.talii.model;
+package vi.talii.model.to;
 
+import vi.talii.model.Card;
+import vi.talii.model.GameResult;
+
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.List;
 
-
-public class GameResponce implements Serializable {
+@XmlRootElement
+public class GameResponse implements Serializable {
 
     private String id;
 
@@ -20,7 +24,7 @@ public class GameResponce implements Serializable {
 
     private GameResult gameResult;
 
-    public GameResponce(String id, List<Card> playerCards, List<Card> dealersCards, int playersScore, int dealersScore,
+    public GameResponse(String id, List<Card> playerCards, List<Card> dealersCards, int playersScore, int dealersScore,
                         int bet) {
         this.id = id;
         this.playerCards = playerCards;
@@ -84,5 +88,19 @@ public class GameResponce implements Serializable {
 
     public void setGameResult(GameResult gameResult) {
         this.gameResult = gameResult;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("GameResponce{");
+        sb.append("id='").append(id).append('\'');
+        sb.append(", bet=").append(bet);
+        sb.append(", playersScore=").append(playersScore);
+        sb.append(", playerCards=").append(playerCards);
+        sb.append(", dealersScore=").append(dealersScore);
+        sb.append(", dealersCards=").append(dealersCards);
+        sb.append(", gameResult=").append(gameResult);
+        sb.append('}');
+        return sb.toString();
     }
 }

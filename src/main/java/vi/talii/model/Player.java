@@ -8,7 +8,7 @@ import java.util.Set;
 public class Player extends GeneratedIdentifierEntity{
 
     @Column(name = "cash", length = 6)
-    private double balance;
+    private double balance;// todo use long instead double
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "playerId")
     private Set<Transaction> moneyTransactions;

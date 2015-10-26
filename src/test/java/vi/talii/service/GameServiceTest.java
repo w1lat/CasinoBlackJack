@@ -1,15 +1,13 @@
 package vi.talii.service;
 
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
 import vi.talii.exception.GameContextNotFoundException;
 import vi.talii.exception.GameCouldNotBeStartedException;
 import vi.talii.exception.GameException;
 import vi.talii.exception.NoSuchPlayerException;
 import vi.talii.model.*;
+import vi.talii.model.to.GameResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +16,9 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotSame;
 import static org.junit.Assert.*;
 
+// todo use logger
 // TODO add to name word Integration
+// todo throws concrete exception, NOT GENERAL
 public class GameServiceTest extends InitAppContextBase {
 
 
@@ -36,11 +36,11 @@ public class GameServiceTest extends InitAppContextBase {
     @Transactional
     public void dealTest() throws GameException {
 
-        GameResponce gameResponce = gameManager.deal(1, 100);
-        assertNotNull(gameResponce);
-        assertEquals(100, gameResponce.getBet());
-        assertNotSame(gameResponce.getPlayerCards(), gameResponce.getDealersCards());
-        assertTrue(gameManager.getActiveGames().containsKey(gameResponce.getId()));
+        GameResponse gameResponse = gameManager.deal(1, 100);
+        assertNotNull(gameResponse);
+        assertEquals(100, gameResponse.getBet());
+        assertNotSame(gameResponse.getPlayerCards(), gameResponse.getDealersCards());
+        assertTrue(gameManager.getActiveGames().containsKey(gameResponse.getId()));
     }
 
     @Test(expected = NoSuchPlayerException.class)
@@ -58,8 +58,8 @@ public class GameServiceTest extends InitAppContextBase {
     @Test
     @Transactional
     public void hitTest() throws Exception {
-        GameResponce gameResponse = gameManager.deal(1, 50);
-        GameResponce hitResponse = gameManager.hit(gameResponse.getId());
+        GameResponse gameResponse = gameManager.deal(1, 50);
+        GameResponse hitResponse = gameManager.hit(gameResponse.getId());
         assertEquals(50, hitResponse.getBet());
         assertNotSame(hitResponse.getPlayerCards(), hitResponse.getDealersCards());
     }
@@ -81,8 +81,8 @@ public class GameServiceTest extends InitAppContextBase {
     @Test
     @Transactional
     public void standTest() throws Exception {
-        GameResponce gameResponse = gameManager.deal(1, 50);
-        GameResponce hitResponse = gameManager.stand(gameResponse.getId());
+        GameResponse gameResponse = gameManager.deal(1, 50);
+        GameResponse hitResponse = gameManager.stand(gameResponse.getId());
         assertEquals(50, hitResponse.getBet());
         assertNotSame(hitResponse.getPlayerCards(), hitResponse.getDealersCards());
     }

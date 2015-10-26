@@ -38,9 +38,10 @@ public class HibernatePlayerDao implements PlayerDao {
         }catch (Exception e){
             LOG.error(e);
             transaction.rollback();
+        } finally {
+            entityManager.close();
         }
-        entityManager.close();
-        return null;
+        return null;//todo throw exception
     }
 
     public Player getPlayerById(long id) throws NoSuchPlayerException {

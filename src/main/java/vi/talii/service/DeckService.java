@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-@Service
+@Service// todo make inteface
 public class DeckService {
 
     private List<Card> deck;
