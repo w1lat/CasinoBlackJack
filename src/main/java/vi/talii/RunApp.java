@@ -6,7 +6,6 @@ import vi.talii.exception.GameException;
 import vi.talii.model.GameResponce;
 import vi.talii.service.GameManager;
 import vi.talii.service.PlayerService;
-import vi.talii.view.ConsoleView;
 
 import java.util.Scanner;
 

@@ -18,13 +18,9 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotSame;
 import static org.junit.Assert.*;
 
+// TODO add to name word Integration
+public class GameServiceTest extends InitAppContextBase {
 
-public class GameServiceTest {
-
-
-    ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:app-context.xml");
-    private GameManager gameManager = applicationContext.getBean(GameManager.class);
-    private DeckService deckService = applicationContext.getBean(DeckService.class);
 
 //    можна якось так? (найшов в неті) TODO
 //    @Autowired
@@ -140,7 +136,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void has21AfterHitTest() throws Exception {
+    public void has21AfterHitTest()  {
         List<Card> deck = new ArrayList<Card>();
         deck.add(new Card(SuitType.HEART, RankType.ACE));
 
@@ -154,7 +150,11 @@ public class GameServiceTest {
 
         GameContext gameContext = new GameContext(10, playerCards, dealersCards, deck, 1);
         gameManager.getActiveGames().put(gameContext.getId(), gameContext);
-        gameManager.hit(gameContext.getId());
+        try {
+            gameManager.hit(gameContext.getId());
+        } catch (GameException e) {
+            e.printStackTrace();
+        }
         assertEquals(GameResult.WIN, gameContext.getGameResult());
     }
 }

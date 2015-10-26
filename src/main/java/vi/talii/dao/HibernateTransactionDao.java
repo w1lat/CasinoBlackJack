@@ -18,7 +18,7 @@ public class HibernateTransactionDao implements TransactionDao {
 
     public static final Logger LOG = Logger.getLogger(HibernateTransactionDao.class);
 
-    @Autowired
+    @Autowired// todo private and write setter for autowired
     EntityManagerFactory entityManagerFactory;
 
     public HibernateTransactionDao() {
@@ -42,8 +42,9 @@ public class HibernateTransactionDao implements TransactionDao {
         }catch (Exception e){
             LOG.error(e);
             entityTransaction.rollback();
+        } finally { // todo close in finally block
+            entityManager.close();
         }
-        entityManager.close();
     }
 
 

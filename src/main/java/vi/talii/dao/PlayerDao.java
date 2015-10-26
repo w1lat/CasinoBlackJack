@@ -9,7 +9,11 @@ import java.util.List;
 public interface PlayerDao {
 
     Player addNewPlayer(Player player);
+
     Player getPlayerById(long id) throws NoSuchPlayerException;
+
     void updatePlayer(Player player);
+
     List<Player> findAll();
+
 }

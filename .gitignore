@@ -12,3 +12,5 @@ target/
 
 #files
 
+*.log
+hsql/

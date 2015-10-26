@@ -15,12 +15,12 @@ import static junit.framework.TestCase.*;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 
-public class PlayerServiceTest {
+// TODO use logger dont throw exception
+public class PlayerServiceTest extends InitAppContextBase {
 
     private static final int BET = 100;
 
-    ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:app-context.xml");
-    PlayerService playerService = applicationContext.getBean(PlayerService.class);
+
 //    автовайред TODO
 //    @Autowired
 //    PlayerService playerService;
