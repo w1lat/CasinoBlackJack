@@ -1,9 +1,7 @@
 package vi.talii.dao;
 
-import vi.talii.model.Transaction;
+import vi.talii.model.to.Transaction;
 
-import javax.swing.text.TabableView;
-import java.awt.event.ItemListener;
 import java.util.List;
 
 

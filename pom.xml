@@ -7,7 +7,6 @@
     <packaging>war</packaging>
     <version>0.1</version>
 
-    <!-- todo extracxt all versions to properties, comment why did you choose depene-->
 
     <name>BlackJack Maven Webapp</name>
     <url>http://maven.apache.org</url>
@@ -18,15 +17,22 @@
         <spring.version>4.1.4.RELEASE</spring.version>
         <log4j.version>1.2.17</log4j.version>
         <junit.version>4.12</junit.version>
-        <sqltool.version>2.3.3</sqltool.version>
         <jersey-server.version>1.9.1</jersey-server.version>
-        <hsqldb.version>2.3.3</hsqldb.version>
+        <mockito.version>1.9.5</mockito.version>
+        <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
+        <jersey-multipart.version>1.8</jersey-multipart.version>
+        <jackson-core.version>2.6.3</jackson-core.version>
+        <jackson-databind.version>2.6.3</jackson-databind.version>
+        <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+        <jersey-json.version>1.19</jersey-json.version>
+        <postgresql.version>9.3-1102-jdbc41</postgresql.version>
     </properties>
 
 
     <dependencies>
 
 
+        <!--Testing Unit-->
 
         <dependency>
             <groupId>junit</groupId>
@@ -35,11 +41,15 @@
             <scope>test</scope>
         </dependency>
 
+        <!--Mock for tests-->
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
+            <version>${mockito.version}</version>
         </dependency>
+
+        <!--Connection to DB-->
 
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -51,6 +61,16 @@
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${hibernate-core.version}</version>
         </dependency>
+
+        <!--DB-->
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+        </dependency>
+
+        <!--Spring Framework-->
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -72,13 +92,11 @@
             <artifactId>spring-orm</artifactId>
             <version>${spring.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
@@ -88,21 +106,18 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
+            <version>${javax.servlet-api.version}</version>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>${hsqldb.version}</version>
-        </dependency>
+        <!--Logger-->
 
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>${log4j.version}</version>
         </dependency>
+
+        <!-- Jersey web service-->
 
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -113,33 +128,27 @@
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-multipart</artifactId>
-            <version>1.8</version>
+            <version>${jersey-multipart.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
-            <version>1.19</version>
+            <version>${jersey-json.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.6.3</version>
+            <version>${jackson-core.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.6.3</version>
+            <version>${jackson-databind.version}</version>
         </dependency>
 
-
-        <!-- <dependency>
-             <groupId>org.glassfish.jersey.ext</groupId>
-             <artifactId>jersey-spring3</artifactId>
-             <version>2.12</version>
-         </dependency>-->
     </dependencies>
 
 
@@ -161,12 +170,14 @@
                             <maxIdleTime>60000</maxIdleTime>
                         </connector>
                     </connectors>
+                    <stopKey/>
+                    <stopPort/>
                 </configuration>
             </plugin>
 
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>${java-version}</source>
                     <target>${java-version}</target>

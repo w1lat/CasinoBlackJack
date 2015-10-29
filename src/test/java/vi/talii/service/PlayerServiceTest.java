@@ -1,29 +1,24 @@
 package vi.talii.service;
 
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import vi.talii.exception.NoSuchPlayerException;
-import vi.talii.model.Player;
+import vi.talii.model.to.Player;
 import vi.talii.model.TransactionType;
 
 import java.util.List;
+
 
 import static junit.framework.TestCase.*;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 
-// TODO use logger dont throw exception
 public class PlayerServiceTest extends InitAppContextBase {
 
+    private static final Logger LOGGER = Logger.getLogger(PlayerServiceTest.class);
     private static final int BET = 100;
 
-
-//    автовайред TODO
-//    @Autowired
-//    PlayerService playerService;
 
     @Test
     public void findAllTest() {
@@ -33,36 +28,51 @@ public class PlayerServiceTest extends InitAppContextBase {
     }
 
     @Test
-    public void canPlayTest() throws NoSuchPlayerException {
+    public void canPlayTest() {
         List<Player> players = playerService.findAll();
         Player player = players.get(0);
         int newBet = (int)player.getBalance() - 1;
-        boolean canPlay = playerService.canPlay(player.getId(), newBet);
+        boolean canPlay = false;
+        try {
+            canPlay = playerService.canPlay(player.getId(), newBet);
+        } catch (NoSuchPlayerException e) {
+           LOGGER.error(e);
+        }
         assertTrue(canPlay);
     }
 
     @Test
-    public void cantPlayTest() throws NoSuchPlayerException {
+    public void cantPlayTest() {
         List<Player> players = playerService.findAll();
         Player player = players.get(0);
         int newBet = (int)player.getBalance() + 1;
-        boolean canPlay = playerService.canPlay(player.getId(), newBet);
+        boolean canPlay = false;
+        try {
+            canPlay = playerService.canPlay(player.getId(), newBet);
+        } catch (NoSuchPlayerException e) {
+            LOGGER.error(e);
+        }
         assertFalse(canPlay);
     }
 
     @Test(expected = NoSuchPlayerException.class)
     public void canPlayInvalidUserTest() throws NoSuchPlayerException {
-        boolean canPlay = playerService.canPlay(150, BET);
+        boolean canPlay = false;
+        canPlay = playerService.canPlay(150, BET);
         assertFalse(canPlay);
     }
 
     @Test
-    public void test_Add_Funds() throws NoSuchPlayerException {
+    public void test_Add_Funds() {
         List<Player> players = playerService.findAll();
         Player player = players.get(0);
         double currentBalance = player.getBalance();
-        playerService.addFunds(player.getId(), BET, TransactionType.INCOME);
-        Player player1 = playerService.find(player.getId());
-        assertEquals(currentBalance + BET, player1.getBalance());
+        try {
+            playerService.addFunds(player.getId(), BET, TransactionType.INCOME);
+            Player player1 = playerService.find(player.getId());
+            assertEquals(currentBalance + BET, player1.getBalance());
+        } catch (NoSuchPlayerException e) {
+            LOGGER.error(e);
+        }
     }
 }

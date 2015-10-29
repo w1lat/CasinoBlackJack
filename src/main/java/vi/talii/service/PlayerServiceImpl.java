@@ -5,11 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vi.talii.dao.PlayerDao;
-import vi.talii.dao.StoragePlayerDao;
 import vi.talii.dao.TransactionDao;
 import vi.talii.exception.NoSuchPlayerException;
-import vi.talii.model.Player;
-import vi.talii.model.Transaction;
+import vi.talii.model.to.Player;
+import vi.talii.model.to.Transaction;
 import vi.talii.model.TransactionType;
 
 import java.util.List;

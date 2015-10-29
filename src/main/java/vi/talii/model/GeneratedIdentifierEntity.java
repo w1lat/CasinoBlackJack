@@ -6,7 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 
-@MappedSuperclass// todo override hashcode and equals
+@MappedSuperclass
 public class GeneratedIdentifierEntity implements Serializable{
 
     @Id

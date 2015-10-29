@@ -1,14 +1,18 @@
-package vi.talii.model;
+package vi.talii.model.to;
+
+import vi.talii.model.GeneratedIdentifierEntity;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Set;
 
 @Entity
 @Table(name = "players")
-public class Player extends GeneratedIdentifierEntity{
+@XmlRootElement
+public class Player extends GeneratedIdentifierEntity {
 
     @Column(name = "cash", length = 6)
-    private double balance;// todo use long instead double
+    private double balance;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "playerId")
     private Set<Transaction> moneyTransactions;

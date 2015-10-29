@@ -11,13 +11,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-@Service// todo make inteface
+@Service
 public class DeckService {
 
     private List<Card> deck;
 
     public List<Card> getNewDeck(boolean shuffled) {
-        deck = new ArrayList<Card>();
+        deck = new ArrayList<>();
         for (SuitType suit : SuitType.values()) {
             for (RankType rank : RankType.values()) {
                 deck.add(new Card(suit, rank));

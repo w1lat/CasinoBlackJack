@@ -18,5 +18,4 @@ public class ErrorInfo {
         return userMessage;
     }
 
-    // Getters/setters/initializer
 }

@@ -1,15 +1,13 @@
 package vi.talii.rest.listener;
 
-import javafx.application.Application;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-/**
- * Created by serhii on 26.10.15.
- */
+
 public class SpringContextInitListener implements ServletContextListener {
 
     @Override

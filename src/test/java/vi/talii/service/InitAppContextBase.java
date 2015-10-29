@@ -1,19 +1,14 @@
 package vi.talii.service;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import vi.talii.dao.PlayerDao;
 import vi.talii.dao.TransactionDao;
 import vi.talii.exception.NoSuchPlayerException;
-import vi.talii.model.Player;
+import vi.talii.model.to.Player;
 
 import java.util.Arrays;
 
@@ -35,8 +30,6 @@ public class InitAppContextBase {
     @Before
     public  void setUpMocks(){
 
-        /*transactionDao = mock(TransactionDao.class);
-        playerDao = mock(PlayerDao.class);*/
 
         try {
             when(playerDao.getPlayerById(1)).thenReturn(new Player(1, 6000));

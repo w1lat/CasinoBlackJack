@@ -3,11 +3,11 @@ package vi.talii;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import vi.talii.dao.PlayerDao;
-import vi.talii.model.Player;
+import vi.talii.dao.TransactionDao;
+import vi.talii.model.to.Player;
+import vi.talii.model.to.Transaction;
+import vi.talii.model.TransactionType;
 
-/**
- * Created by Vitalii on 12.10.2015.
- */
 public class AddPlayersToDB {
 
     public static void main(String[] args) {
@@ -27,5 +27,34 @@ public class AddPlayersToDB {
         player3.setBalance(6000);
         playerDao.addNewPlayer(player3);
         System.out.println(playerDao.findAll());
+
+        TransactionDao transactionDao = applicationContext.getBean(TransactionDao.class);
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(200);
+        transaction.setPaymentType(TransactionType.BET);
+        transaction.setPlayerId(2L);
+        transactionDao.save(transaction);
+        System.out.println(transactionDao.findAll());
+        System.out.println(transactionDao.findByPlayerId(2L));
+        Transaction transaction1 = new Transaction();
+        transaction1.setAmount(500);
+        transaction1.setPaymentType(TransactionType.WIN);
+        transaction1.setPlayerId(2L);
+        transactionDao.save(transaction1);
+        Transaction transaction2 = new Transaction();
+        transaction2.setAmount(600);
+        transaction2.setPaymentType(TransactionType.INCOME);
+        transaction2.setPlayerId(2L);
+        transactionDao.save(transaction2);
+        Transaction transaction3 = new Transaction();
+        transaction3.setAmount(200);
+        transaction3.setPaymentType(TransactionType.PUSH);
+        transaction3.setPlayerId(2L);
+        transactionDao.save(transaction3);
+        System.out.println(transactionDao.findAll());
+        System.out.println(transactionDao.findByPlayerId(2L));
+
+
     }
 }

@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import vi.talii.exception.NoSuchPlayerException;
-import vi.talii.model.Player;
+import vi.talii.model.to.Player;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -41,7 +41,7 @@ public class HibernatePlayerDao implements PlayerDao {
         } finally {
             entityManager.close();
         }
-        return null;//todo throw exception
+        return null;
     }
 
     public Player getPlayerById(long id) throws NoSuchPlayerException {
@@ -63,6 +63,8 @@ public class HibernatePlayerDao implements PlayerDao {
         } catch(Exception e){
             transaction.rollback();
             e.printStackTrace();
+        }finally {
+            entityManager.close();
         }
     }
 

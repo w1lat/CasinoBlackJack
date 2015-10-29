@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-// todo interface form logic
+
 public class GameContext {
 
     private static final int BLACKJACK = 21;
@@ -33,24 +33,72 @@ public class GameContext {
         this.account = account;
     }
 
-    public boolean isPlayerBusted() {
-        return getPlayerPoints() > BLACKJACK;
-    }
-
     public int getPlayerPoints() {
         return getPoints(playerCards);
-    }
-
-    public boolean isDealerBusted() {
-        return getDealerPoints() > BLACKJACK;
     }
 
     public int getDealerPoints() {
         return getPoints(dealerCards);
     }
 
+    public List<Card> getDeck() {
+        return deck;
+    }
+
+    public List<Card> getDealerCards() {
+        return dealerCards;
+    }
+
+    public List<Card> getPlayerCards() {
+        return playerCards;
+    }
+
+    public int getBet() {
+        return bet;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public long getAccount() {
+        return account;
+    }
+
+    public boolean isDealerBlackjack() {
+        return dealerCards.size() == BLACKJACK_CARDS_COUNT && getDealerPoints() == BLACKJACK;
+    }
+
+    public boolean isPlayerBlackjack() {
+        return playerCards.size() == BLACKJACK_CARDS_COUNT && getPlayerPoints() == BLACKJACK;
+    }
+
+    public boolean isDealerBusted() {
+        return getDealerPoints() > BLACKJACK;
+    }
+
+    public boolean isPlayerBusted() {
+        return getPlayerPoints() > BLACKJACK;
+    }
+
+    private boolean isOnlyPlayerHasBlackJack() {
+        return isPlayerBlackjack() && !isDealerBlackjack();
+    }
+
+    private boolean checkPlayerBustedAndPoint() {
+        return !isPlayerBusted() && (isDealerBusted() || getPlayerPoints() > getDealerPoints());
+    }
+
+    private boolean checkDealerBustedAndPoints() {
+        return !isDealerBusted() && (isPlayerBusted() || getDealerPoints() > getPlayerPoints());
+    }
+
+    private boolean isOnlyDealerHasBlackJack() {
+        return isDealerBlackjack() && !isPlayerBlackjack();
+    }
+
     public int getPoints(List<Card> cards) {
-        List<Card> aces = new ArrayList<Card>();
+        List<Card> aces = new ArrayList<>();
         int sum = 0;
         for (Card card : cards) {
             if (card.getRank() != RankType.ACE) {
@@ -78,53 +126,5 @@ public class GameContext {
             return GameResult.LOOSE;
         }
         return GameResult.PUSH;
-    }
-
-    public boolean isDealerBlackjack() {
-        return dealerCards.size() == BLACKJACK_CARDS_COUNT && getDealerPoints() == BLACKJACK;
-    }
-
-    public boolean isPlayerBlackjack() {
-        return playerCards.size() == BLACKJACK_CARDS_COUNT && getPlayerPoints() == BLACKJACK;
-    }
-
-    public List<Card> getDeck() {
-        return deck;
-    }
-
-    public List<Card> getDealerCards() {
-        return dealerCards;
-    }
-
-    public List<Card> getPlayerCards() {
-        return playerCards;
-    }
-
-    public int getBet() {
-        return bet;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public long getAccount() {
-        return account;
-    }
-
-    private boolean isOnlyPlayerHasBlackJack() {
-        return isPlayerBlackjack() && !isDealerBlackjack();
-    }
-
-    private boolean checkPlayerBustedAndPoint() {
-        return !isPlayerBusted() && (isDealerBusted() || getPlayerPoints() > getDealerPoints());
-    }
-
-    private boolean checkDealerBustedAndPoints() {
-        return !isDealerBusted() && (isPlayerBusted() || getDealerPoints() > getPlayerPoints());
-    }
-
-    private boolean isOnlyDealerHasBlackJack() {
-        return isDealerBlackjack() && !isPlayerBlackjack();
     }
 }

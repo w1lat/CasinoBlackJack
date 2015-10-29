@@ -1,8 +1,7 @@
 package vi.talii.service;
 
-import org.hibernate.Transaction;
 import vi.talii.exception.NoSuchPlayerException;
-import vi.talii.model.Player;
+import vi.talii.model.to.Player;
 import vi.talii.model.TransactionType;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public interface PlayerService {
 
     void takeFunds(long account, int funds) throws NoSuchPlayerException;
 
-    List<vi.talii.model.Transaction> findAllTransactionsByPlayer(long account) throws NoSuchPlayerException;
+    List<vi.talii.model.to.Transaction> findAllTransactionsByPlayer(long account) throws NoSuchPlayerException;
 
-    List<vi.talii.model.Transaction> findAllTransactions();
+    List<vi.talii.model.to.Transaction> findAllTransactions();
 }

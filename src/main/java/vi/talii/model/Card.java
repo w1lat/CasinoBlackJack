@@ -38,10 +38,11 @@ public class Card {
                 '}';
     }
 
+    //returns points for a card from 1 to 10 depends a card
     public int getValue() {
         if (rank == rank.JACK || rank == rank.QUEEN || rank == rank.KING) {
             return 10;
         }
-        return rank.ordinal() + 1;//todo do clear logic or describe solution
+        return rank.ordinal() + 1;
     }
 }

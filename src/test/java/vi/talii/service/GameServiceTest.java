@@ -1,5 +1,6 @@
 package vi.talii.service;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
 import vi.talii.exception.GameContextNotFoundException;
@@ -16,27 +17,23 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotSame;
 import static org.junit.Assert.*;
 
-// todo use logger
-// TODO add to name word Integration
-// todo throws concrete exception, NOT GENERAL
 public class GameServiceTest extends InitAppContextBase {
 
-
-//    можна якось так? (найшов в неті) TODO
-//    @Autowired
-//    private GameManager gameManager;
-
-//    @Autowired
-//    private DeckService deckService;
+    private static final Logger LOGGER = Logger.getLogger(GameServiceTest.class);
 
     public GameServiceTest() {
     }
 
     @Test
     @Transactional
-    public void dealTest() throws GameException {
+    public void dealTest() {
 
-        GameResponse gameResponse = gameManager.deal(1, 100);
+        GameResponse gameResponse = null;
+        try {
+            gameResponse = gameManager.deal(1, 100);
+        } catch (GameException e) {
+            LOGGER.error(e);
+        }
         assertNotNull(gameResponse);
         assertEquals(100, gameResponse.getBet());
         assertNotSame(gameResponse.getPlayerCards(), gameResponse.getDealersCards());
@@ -57,43 +54,53 @@ public class GameServiceTest extends InitAppContextBase {
 
     @Test
     @Transactional
-    public void hitTest() throws Exception {
-        GameResponse gameResponse = gameManager.deal(1, 50);
-        GameResponse hitResponse = gameManager.hit(gameResponse.getId());
-        assertEquals(50, hitResponse.getBet());
-        assertNotSame(hitResponse.getPlayerCards(), hitResponse.getDealersCards());
+    public void hitTest() {
+        GameResponse gameResponse = null;
+        try {
+            gameResponse = gameManager.deal(1, 50);
+            GameResponse hitResponse = gameManager.hit(gameResponse.getId());
+            assertEquals(50, hitResponse.getBet());
+            assertNotSame(hitResponse.getPlayerCards(), hitResponse.getDealersCards());
+        } catch (GameException e) {
+            LOGGER.error(e);
+        }
     }
 
     @Test(expected = GameContextNotFoundException.class)
     @Transactional
-    public void invalidGameIdOnHitTest() throws Exception {
+    public void invalidGameIdOnHitTest() throws GameException {
         gameManager.deal(1, 50);
         gameManager.hit("gameID");
     }
 
     @Test(expected = GameContextNotFoundException.class)
     @Transactional
-    public void invalidGameIdOnStandTest() throws Exception {
+    public void invalidGameIdOnStandTest() throws GameException {
         gameManager.deal(1, 50);
         gameManager.stand("gameID");
     }
 
     @Test
     @Transactional
-    public void standTest() throws Exception {
-        GameResponse gameResponse = gameManager.deal(1, 50);
-        GameResponse hitResponse = gameManager.stand(gameResponse.getId());
-        assertEquals(50, hitResponse.getBet());
-        assertNotSame(hitResponse.getPlayerCards(), hitResponse.getDealersCards());
+    public void standTest() {
+        GameResponse gameResponse = null;
+        try {
+            gameResponse = gameManager.deal(1, 50);
+            GameResponse hitResponse = gameManager.stand(gameResponse.getId());
+            assertEquals(50, hitResponse.getBet());
+            assertNotSame(hitResponse.getPlayerCards(), hitResponse.getDealersCards());
+        } catch (GameException e) {
+            LOGGER.error(e);
+        }
     }
 
     @Test
-    public void playerHasBlackjackTest() throws Exception {
-        List<Card> playerCards = new ArrayList<Card>();
+    public void playerHasBlackjackTest(){
+        List<Card> playerCards = new ArrayList<>();
         playerCards.add(new Card(SuitType.CLUB, RankType.TEN));
         playerCards.add(new Card(SuitType.HEART, RankType.ACE));
 
-        List<Card> dealersCards = new ArrayList<Card>();
+        List<Card> dealersCards = new ArrayList<>();
         dealersCards.add(new Card(SuitType.HEART, RankType.QUEEN));
 
         GameContext gameContext = new GameContext(10, playerCards, dealersCards, null, 1);
@@ -103,29 +110,33 @@ public class GameServiceTest extends InitAppContextBase {
 
     @Test
     @Transactional
-    public void playerBustedTest() throws Exception {
+    public void playerBustedTest() {
         List<Card> deck = deckService.getNewDeck(true);
-        List<Card> playerCards = new ArrayList<Card>();
+        List<Card> playerCards = new ArrayList<>();
         playerCards.add(new Card(SuitType.CLUB, RankType.TEN));
         playerCards.add(new Card(SuitType.SPADE, RankType.TEN));
         playerCards.add(new Card(SuitType.HEART, RankType.ACE));
 
-        List<Card> dealersCards = new ArrayList<Card>();
+        List<Card> dealersCards = new ArrayList<>();
         dealersCards.add(new Card(SuitType.HEART, RankType.QUEEN));
 
         GameContext gameContext = new GameContext(10, playerCards, dealersCards, deck, 1);
         gameManager.getActiveGames().put(gameContext.getId(), gameContext);
-        gameManager.hit(gameContext.getId());
+        try {
+            gameManager.hit(gameContext.getId());
+        } catch (GameException e) {
+            LOGGER.error(e);
+        }
         assertEquals(GameResult.LOOSE, gameContext.getGameResult());
     }
 
     @Test
-    public void pushTest() throws Exception {
-        List<Card> playerCards = new ArrayList<Card>();
+    public void pushTest(){
+        List<Card> playerCards = new ArrayList<>();
         playerCards.add(new Card(SuitType.CLUB, RankType.QUEEN));
         playerCards.add(new Card(SuitType.HEART, RankType.KING));
 
-        List<Card> dealersCards = new ArrayList<Card>();
+        List<Card> dealersCards = new ArrayList<>();
         dealersCards.add(new Card(SuitType.HEART, RankType.JACK));
         dealersCards.add(new Card(SuitType.HEART, RankType.FOUR));
         dealersCards.add(new Card(SuitType.HEART, RankType.SIX));
@@ -137,13 +148,13 @@ public class GameServiceTest extends InitAppContextBase {
 
     @Test
     public void has21AfterHitTest()  {
-        List<Card> deck = new ArrayList<Card>();
+        List<Card> deck = new ArrayList<>();
         deck.add(new Card(SuitType.HEART, RankType.ACE));
 
-        List<Card> playerCards = new ArrayList<Card>();
+        List<Card> playerCards = new ArrayList<>();
         playerCards.add(new Card(SuitType.CLUB, RankType.TEN));
 
-        List<Card> dealersCards = new ArrayList<Card>();
+        List<Card> dealersCards = new ArrayList<>();
         dealersCards.add(new Card(SuitType.HEART, RankType.JACK));
         dealersCards.add(new Card(SuitType.HEART, RankType.FOUR));
         dealersCards.add(new Card(SuitType.HEART, RankType.SIX));
@@ -153,7 +164,7 @@ public class GameServiceTest extends InitAppContextBase {
         try {
             gameManager.hit(gameContext.getId());
         } catch (GameException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
         assertEquals(GameResult.WIN, gameContext.getGameResult());
     }

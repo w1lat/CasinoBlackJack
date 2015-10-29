@@ -10,16 +10,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-/**
- * Created by serhii on 26.10.15.
- */@Provider
-public class GenericExceptionMapper implements ExceptionMapper<GameException> { // todo use generic for own class
+@Provider
+public class GenericExceptionMapper implements ExceptionMapper<GameException> {
 
-
-   /* @Override
-    public Response toResponse(Throwable throwable) {
-            return Response.status(500).entity(throwable.getMessage()).type("application/json").build();
-    }*/
 
     private static final transient ObjectMapper MAPPER = new ObjectMapper();
 
@@ -34,7 +27,7 @@ public class GenericExceptionMapper implements ExceptionMapper<GameException> { 
 
     private String defaultJSON(final GameException exception)
     {
-        ErrorInfo errorInfo = new ErrorInfo(exception.getMessage(),"test"); // todo add user message
+        ErrorInfo errorInfo = new ErrorInfo(exception.getMessage(),"Sorry, " + exception.getMessage());
 
         try
         {

@@ -1,9 +1,13 @@
-package vi.talii.model;
+package vi.talii.model.to;
+
+import vi.talii.model.TransactionType;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
 @Entity
+@XmlRootElement
 public class Transaction implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -19,7 +23,7 @@ public class Transaction implements Serializable {
     @Enumerated(EnumType.ORDINAL)
     private TransactionType paymentType;
 
-    @Column// TODO use long for money, BigDecimal
+    @Column
     private double amount;
 
     public Transaction() {
@@ -61,5 +65,15 @@ public class Transaction implements Serializable {
 
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id=" + id +
+                ", playerId=" + playerId +
+                ", paymentType=" + paymentType +
+                ", amount=" + amount +
+                '}';
     }
 }

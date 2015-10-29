@@ -1,7 +1,7 @@
 package vi.talii.dao;
 
 import vi.talii.exception.NoSuchPlayerException;
-import vi.talii.model.Player;
+import vi.talii.model.to.Player;
 
 import java.util.List;
 

@@ -1,21 +1,19 @@
 CREATE DATABASE BlackJack;
 
-CREATE TABLE users (
-  id int NOT NULL UNIQUE AUTO_INCREMENT,
-  cash int (6),
+CREATE SEQUENCE auto_id_players;
+
+CREATE TABLE players (
+  id int NOT NULL DEFAULT nextval('auto_id_players'),
+  cash int,
   PRIMARY KEY (id)
 );
 
+CREATE SEQUENCE auto_id_transactions;
 
-CREATE TABLE players (
-  id int NOT NULL IDENTITY,
-  cash int
-);
-
-CREATE TABLE transactions {
-  id int NOT NULL IDENTITY,
-  player_id int NOT NULL,
-  trans_type text(10),
+CREATE TABLE transactions (
+  id int NOT NULL DEFAULT nextval('auto_id_transactions'),
+  player_id int NOT NULL references players(id),
+  trans_type varchar(10),
   amount real,
-  FOREIGN KEY(player_id)
-  };
+  PRIMARY KEY (id)
+);

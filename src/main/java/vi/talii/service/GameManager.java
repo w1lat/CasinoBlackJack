@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service//todo make interface and implement
+@Service
 public class GameManager {
 
     private static final Logger LOGGER = Logger.getLogger(GameManager.class);
@@ -24,7 +24,7 @@ public class GameManager {
 
     private DeckService deckService;
 
-    private Map<String, GameContext> activeGames = new HashMap<String, GameContext>();
+    private Map<String, GameContext> activeGames = new HashMap<>();
 
     private String currentGameId;
 
@@ -123,8 +123,8 @@ public class GameManager {
     private GameContext createNewGame(long account, int bet) throws NoSuchPlayerException {
         LOGGER.info("Building new GameContext...");
         List<Card> deck = deckService.getNewDeck(true);
-        List<Card> playersCards = new ArrayList<Card>();
-        List<Card> dealersCards = new ArrayList<Card>();
+        List<Card> playersCards = new ArrayList<>();
+        List<Card> dealersCards = new ArrayList<>();
         playersCards.add(deckService.dealNextCard(deck));
         playersCards.add(deckService.dealNextCard(deck));
         dealersCards.add(deckService.dealNextCard(deck));
