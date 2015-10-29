@@ -23,20 +23,20 @@ mvn jetty:run - in terminal
 --
 ##Links for game
 
-http://localhost:8080/BlackJack/rest/blackjack/deal/{player_id}/{cash}  -  start new game
-http://localhost:8080/BlackJack/rest/blackjack/deal/{game_id}/hit       -  hit'
-http://localhost:8080/BlackJack/rest/blackjack/deal/{game_id}/stand     - stand'
+http://localhost:8080/BlackJack/rest/blackjack/deal/{player_id}/{cash}  -  **start new game
+http://localhost:8080/BlackJack/rest/blackjack/deal/{game_id}/hit       -  **hit'
+http://localhost:8080/BlackJack/rest/blackjack/deal/{game_id}/stand     - **stand'
 
     ' - game_id returns to you in json when you start new game
 
 --
 ##Links for game stats
 
-http://localhost:8080/BlackJack/rest/players                            - list of all players with their transactions
-http://localhost:8080/BlackJack/rest/players/{player_id}                - all information about player = {player_id}
-http://localhost:8080/BlackJack/rest/players/{player_id}/transactions   - all transactions by player = {player_id}
-http://localhost:8080/BlackJack/rest/players/transactions               - all transactions by all players
-http://localhost:8080/BlackJack/rest/players/{layer_id}/{cash}          - add {cash} to player = {player_id}
+http://localhost:8080/BlackJack/rest/players                            - **list of all players with their transactions
+http://localhost:8080/BlackJack/rest/players/{player_id}                - **all information about player = {player_id}
+http://localhost:8080/BlackJack/rest/players/{player_id}/transactions   - **all transactions by player = {player_id}
+http://localhost:8080/BlackJack/rest/players/transactions               - **all transactions by all players
+http://localhost:8080/BlackJack/rest/players/{layer_id}/{cash}          - **add {cash} to player = {player_id}
 
 --
 ##Testing
