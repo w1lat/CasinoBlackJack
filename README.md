@@ -1,7 +1,8 @@
 #BlackJack casino game
 
 ##RESTful webservice
-Game is based on standard rules of casino BlackJack
+Game is based on standard rules of casino BlackJack.
+ 
 Technologies used: Spring, Hibernate Database: PostgreSQL, jUnit, log4j, Maven, JAX-RS, Jersey, Jetty, Mockito, json
 
 
@@ -46,8 +47,9 @@ Test start with run of jetty server
 --
 ##Properties
 
-DB properties are in            ##app.properties
-Logger properties are in        ##log4j.properties
+DB properties are in            app.properties
+
+Logger properties are in        log4j.properties
 
 
                             **developed by Vitalii Balytskyi, 2015**
